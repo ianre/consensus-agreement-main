@@ -71,6 +71,7 @@ def main():
     #I.verifyOutput()
     #I.showAllPlots()
     I.metrics()
+
     quit(); 
 
 class Iterator:
@@ -268,6 +269,7 @@ class Iterator:
         print( "Post Weight:",str(  postAggregate / lineCount ))
 
         return;
+    
     def getAverage(self,file,fileName,x_col=0, y_col=5,y_c_col=9):
         preAvg = 0
         postAvg = 0

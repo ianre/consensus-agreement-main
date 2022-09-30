@@ -64,13 +64,14 @@ def main():
     '''
 
     #print(task)
-    task = "Pea_on_a_Peg" #then suturing to b done w/ jigs
+    task = "Knot_Tying" #then suturing to b done w/ jigs
     I = Iterator(task)
     #I.fixStates()
     #I.poll()
     #I.verifyOutput()
     #I.showAllPlots()
-    #I.metrics()
+    I.metrics()
+
     quit(); 
 
 class Iterator:
@@ -268,6 +269,7 @@ class Iterator:
         print( "Post Weight:",str(  postAggregate / lineCount ))
 
         return;
+    
     def getAverage(self,file,fileName,x_col=0, y_col=5,y_c_col=9):
         preAvg = 0
         postAvg = 0
@@ -375,6 +377,29 @@ class Iterator:
             i = i + 1
         return lines;
     
+    def unrollContext(self, lines):
+        n_lines = []
+        start = lines[0].split(" ")[0] 
+        start = int(start)
+        MAX = lines[-1].split(" ")[0]
+        #MAX = int(MAX)
+        if(start > 0):
+            for j in range(0, start):
+                n_lines.append(str(j)+ " 0 0 0 0 0")
+
+
+        for i in range(0,len(lines)-1):
+            n_lines.append(lines[i])
+            currentIndex = lines[i].split(" ")[0]
+            currentIndex = int(currentIndex)
+            nextIndex = lines[i+1].split(" ")[0]
+            nextIndex = int(nextIndex)
+            for k in range(currentIndex+1,nextIndex):
+                n_lines.append(str(k) + " " + " ".join(lines[i].split(" ")[1:] ))
+        
+        n_lines.append(lines[len(lines)-1])
+        return n_lines
+        
     def poll(self):
         # get a filename from Kay's set:
         count = 0
@@ -405,12 +430,22 @@ class Iterator:
                     for line in ian_data:
                         ian_lines.append(line.strip())
                 #print("Here")
-                ian_lines = self.takeAwayAngles(ian_lines)
+                #ian_lines = self.takeAwayAngles(ian_lines)
                 v_lines = []
                 with open(v_file) as v_data:
                     for line in v_data:
                         v_lines.append(line.strip())
-                
+
+                kay_lines = self.unrollContext(kay_lines)
+                ian_lines = self.unrollContext(ian_lines)
+                v_lines = self.unrollContext(v_lines)
+
+                LinesMin = min(len(kay_lines),len(ian_lines))
+                kay_lines = kay_lines[0:LinesMin]
+                ian_lines = ian_lines[0:LinesMin]
+                v_lines = v_lines[0:LinesMin]
+
+
                 out_lines = []
                 kappa_lines = []
                 #match_lines = []
@@ -422,6 +457,8 @@ class Iterator:
 
                 i = 0                
                 for line in kay_lines:
+                    if i >= len(v_lines) or i >= len(ian_lines):
+                        continue
                     line = line.replace("\n","")
                     ian_line = ian_lines[i].replace("\n","")
                     v_line = v_lines[i].replace("\n","")
