@@ -48,11 +48,16 @@ def main():
     
     dir=os.getcwd()
     task = "Suturing"
+    LABEL_TYPE = "MP"
+    SUBJECT = "Surgeon"
     try:
-        task=sys.argv[1]
+        #task=sys.argv[1]
+        LABEL_TYPE=sys.argv[1]
+        SUBJECT=sys.argv[2]
     except:
-        print("Error: no task provided \nUsage: python draw_labels.py <task>")
-        
+        print("Error: no task provided \nUsage: python consensus-metrics.py <LABEL_TYPE:Gestures | MP | Context> <SUBJECT:Surgeon| All | Trial [1,2,3] >")
+
+      
     #I = Iterator(task)
     #I.fixStates()
     #I.poll()
@@ -65,12 +70,25 @@ def main():
     #setupMP()
 
     #setupUniqueCompGestures()
+
+
     
     #setupUniqueCompMP()  
-    setupUniqueCompMPForCoder()
+    #setupUniqueCompMPForCoder()
     #setupUniqueCompGestureForCoder()
 
     #setupContextCoderwise()
+
+    if LABEL_TYPE == "Gestures":
+        setupUniqueCompGestureForCoder()
+    elif LABEL_TYPE == "MP":
+        if SUBJECT == "All":
+            setupUniqueCompMP()
+        else:
+            #trial
+            setupUniqueCompMPForCoder(SUBJECT)    
+    elif LABEL_TYPE == "Context":
+        setupContextCoderwise()
     
     quit(); 
 
@@ -159,7 +177,7 @@ def setupUniqueCompMP():
     C = ConsensusEngine(dataTypeA,coders, tasks, dataTypeB)
     C.nominalAgreement()
 
-def setupUniqueCompMPForCoder():
+def setupUniqueCompMPForCoder(SUBJECT=""):
     '''
     Test in which:
         We compare individual MP labels to translated MP labels
@@ -167,7 +185,10 @@ def setupUniqueCompMPForCoder():
     '''
     dataTypeA = "MP Labels"
     coders=" --- "
-    coder = "Trial 1"
+    if SUBJECT != "":
+        coder = SUBJECT #default
+    else:
+        coder = "Trial 1" #default
     dataTypeB = "MP_Context" # contains the static files (uncombined LR)
     tasks = ["Knot_Tying","Suturing","Needle_Passing"]     
     C = ConsensusEngine(dataTypeA,coders, tasks, dataTypeB)
